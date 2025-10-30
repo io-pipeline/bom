@@ -21,6 +21,6 @@ jobs:
 
     - name: Publish BOM and catalog to Gitea Maven
       if: github.ref == 'refs/heads/main'
-      run: ./gradlew publishToGiteaRepository -Pgitea.token=$MAVEN_PUBLISH_TOKEN
+      run: ./gradlew publishAllPublicationsToGiteaRepository -Pgitea.token=$MAVEN_PUBLISH_TOKEN
       env:
         MAVEN_PUBLISH_TOKEN: ${{ secrets.MAVEN_PUBLISH_TOKEN }}
