@@ -1,0 +1,127 @@
+plugins {
+    alias(libs.plugins.java.platform)
+    alias(libs.plugins.maven.publish)
+}
+
+group = 'io.pipeline'
+version = '1.0.0-SNAPSHOT'
+
+description = 'Pipeline BOM - Bill of Materials'
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    // Quarkus BOM - base platform
+    api platform(libs.quarkus.bom)
+
+    // Import grpc and protobuf BOMs (brings all their managed versions)
+    // We'll override specific versions below with strict constraints
+    api platform("io.grpc:grpc-bom:${libs.versions.grpc.get()}")
+    api platform("com.google.protobuf:protobuf-bom:${libs.versions.protobuf.get()}")
+
+    constraints {
+        // External libraries not managed by Quarkus
+        api libs.opensearch.java
+
+        // WireMock (standalone versions for grpc-wiremock library)
+        api libs.wiremock.standalone
+        api libs.wiremock.grpc.extension.standalone
+
+        // Apicurio Registry
+        api libs.apicurio.registry.java.sdk
+        api libs.apicurio.registry.common
+        api libs.apicurio.registry.protobuf.serde
+
+        // Document parsing
+        api libs.commonmark
+        api libs.pdfbox
+
+        // Security
+        api libs.password4j
+
+        // MCP Server
+        api libs.quarkus.mcp.server.sse
+
+        // Testing utilities
+        api libs.smallrye.reactive.messaging.in.memory
+
+        // Force our grpc/protobuf versions to win over Quarkus
+        // Using strictly() ensures these versions override the Quarkus BOM
+        api("io.grpc:grpc-protobuf") {
+            version { strictly(libs.versions.grpc.get()) }
+        }
+        api("io.grpc:grpc-stub") {
+            version { strictly(libs.versions.grpc.get()) }
+        }
+        api("io.grpc:grpc-api") {
+            version { strictly(libs.versions.grpc.get()) }
+        }
+        api("com.google.protobuf:protobuf-java") {
+            version { strictly(libs.versions.protobuf.get()) }
+        }
+        api("com.google.protobuf:protobuf-java-util") {
+            version { strictly(libs.versions.protobuf.get()) }
+        }
+
+        // Our internal libraries (published to Maven Local for dev)
+        api("io.pipeline:grpc-stubs:1.0.0-SNAPSHOT")
+        api("io.pipeline:grpc-wiremock:1.0.0-SNAPSHOT")
+        api("io.pipeline:pipeline-api:1.0.0-SNAPSHOT")
+        api("io.pipeline:pipeline-commons:1.0.0-SNAPSHOT")
+        api("io.pipeline:dynamic-grpc:1.0.0-SNAPSHOT")
+        api("io.pipeline:dynamic-grpc-registration-clients:1.0.0-SNAPSHOT")
+        api("io.pipeline:data-util:1.0.0-SNAPSHOT")
+        api("io.pipeline:testing-utils:1.0.0-SNAPSHOT")
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.javaPlatform
+            artifactId = 'pipeline-bom'
+            pom {
+                name.set('Pipeline BOM')
+                description.set('Bill of Materials for Pipeline project')
+                url.set('https://github.com/io-pipeline/pipeline')
+
+                licenses {
+                    license {
+                        name.set('Apache License 2.0')
+                        url.set('https://www.apache.org/licenses/LICENSE-2.0')
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set('krickert')
+                        name.set('Pipeline Engine Team')
+                    }
+                }
+
+                scm {
+                    connection.set('scm:git:git://github.com/io-pipeline/pipeline.git')
+                    developerConnection.set('scm:git:ssh://github.com/io-pipeline/pipeline.git')
+                    url.set('https://github.com/io-pipeline/pipeline')
+                }
+            }
+        }
+    }
+
+    repositories {
+        // Publish to Maven Local for development
+        mavenLocal()
+
+        // Publish to GitHub Packages
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/io-pipeline/pipeline")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}

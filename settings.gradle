@@ -1,0 +1,28 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'pipeline-bom'
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri('https://s01.oss.sonatype.org/content/groups/public/')
+            content {
+                includeGroupByRegex 'io\\.quarkus(\\..*)?'
+                includeGroup 'io.quarkus.platform'
+            }
+        }
+    }
+
+    versionCatalogs {
+        libs {
+            // Import version catalog from parent repo
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
+}
