@@ -114,10 +114,20 @@ publishing {
         // Publish to Maven Local for development
         mavenLocal()
 
-        // Publish to GitHub Packages
+        // Publish to Gitea Maven registry (primary)
+        maven {
+            name = "Gitea"
+            url = uri("https://git.rokkon.com/api/packages/io-pipeline/maven")
+            credentials {
+                username = project.findProperty("gitea.user") ?: System.getenv("GITEA_USER") ?: "krickert"
+                password = project.findProperty("gitea.token") ?: System.getenv("GITEA_TOKEN")
+            }
+        }
+
+        // Publish to GitHub Packages (mirror)
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/io-pipeline/pipeline")
+            url = uri("https://maven.pkg.github.com/io-pipeline/bom")
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
