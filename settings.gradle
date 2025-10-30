@@ -19,10 +19,5 @@ dependencyResolutionManagement {
         }
     }
 
-    versionCatalogs {
-        libs {
-            // Import version catalog from parent repo
-            from(files("../gradle/libs.versions.toml"))
-        }
-    }
+    // Version catalog auto-loaded from gradle/libs.versions.toml
 }
