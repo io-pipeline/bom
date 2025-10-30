@@ -1,3 +1,1 @@
-# bom
-
-Pipeline java bill-of-materials
+# Pipeline BOM - Fast builds with custom runner!
