@@ -28,6 +28,6 @@ jobs:
 
     - name: Publish to Gitea Maven
       if: github.ref == 'refs/heads/main'
-      run: ./gradlew publishMavenPublicationToGiteaRepository
+      run: ./gradlew publish -Pgitea.token=$GITEA_TOKEN
       env:
         GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
