@@ -9,7 +9,16 @@ rootProject.name = 'pipeline-bom'
 
 dependencyResolutionManagement {
     repositories {
+        // Nexus as Maven Central mirror (fast local cache on NAS)
+        maven {
+            url = uri('https://maven.rokkon.com/repository/maven-public/')
+            allowInsecureProtocol = false
+        }
+
+        // Fallback to Maven Central if Nexus unavailable
         mavenCentral()
+
+        // Sonatype snapshots for Quarkus (also proxied through Nexus if configured)
         maven {
             url = uri('https://s01.oss.sonatype.org/content/groups/public/')
             content {
